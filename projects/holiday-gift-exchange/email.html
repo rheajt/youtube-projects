@@ -1,0 +1,19 @@
+<div class="wrapper" style="height: 100%; overflow: hidden; font-family: sans-serif; background: linear-gradient(45deg, darkgrey, lightgrey); padding: 20px 0;">
+  <div class="window" style="background: white; width: 400px; height: 400px; margin: 0 auto; box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.5); border-top: 4px solid red; border-bottom: 4px solid green;">
+    <div class="content" style="padding: 12px 16px;">
+      <h1>Dear <?= data.name ?>,</h1>
+      <p>Thanks for signing up for the gift exchange.</p>
+      <br>
+      <p>Your partner is: <b><?= data.pair.name ?></b></p>
+      <p>Their hobby is: <b><?= data.pair.hobby ?></b></p>
+      <p>Their favorite book is: <b><?= data.pair.book ?></b></p>
+      <p>Their favorite movie is: <b><?= data.pair.movie ?></b></p>
+      <p>Their favorite sport is: <b><?= data.pair.sport ?></b></p>
+      <p>Other interesting things about them: <b><?= data.pair.other ?></b></p>
+      <br>
+      <p>Get them a gift before the exchange date of <?= exchange ?></p>
+    </div>
+  </div>
+</div>
+
+

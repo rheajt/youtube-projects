@@ -1,0 +1,362 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css?family=Libre+Baskerville|Raleway|Satisfy|Pathway+Gothic+One" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<style>
+html {
+  margin: 0;
+}
+
+body {
+  background: url(http://blog.jordanrhea.com/wp-content/uploads/2017/05/word-cloud.jpg) top left no-repeat;
+  background-size: cover;
+  padding-top: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Libre Baskerville", serif;
+}
+
+p, li, a, button {
+  font-family: "Raleway", sans-serif;
+}
+
+button:focus {
+  outline: none;
+}
+button.active {
+  background: #f79162;
+}
+
+input[type=text] {
+  margin: 0 auto;
+}
+
+nav {
+  text-align: center;
+  padding: 0;
+  margin: 0 auto;
+  width: 80%;
+  background: #b74009;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+nav button {
+  min-width: 20%;
+  color: white;
+  border: 2px solid #b74009;
+  padding: 10px 20px;
+  background: #a83b08;
+  transition: background 0.2s;
+}
+nav button:hover {
+  background: #862f07;
+}
+nav h1 {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+  color: white;
+}
+
+section {
+  overflow: hidden;
+  width: 80%;
+  background: white;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid grey;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+#portfolio {
+  box-sizing: border-box;
+  padding: 10px 40px;
+  margin: 0 auto;
+  width: 80%;
+}
+#portfolio .user-info {
+  box-sizing: border-box;
+  text-align: center;
+}
+#portfolio .user-info img, section .user-info h1 {
+  display: inline-block;
+  margin: 0;
+}
+#portfolio .user-info img {
+  height: 50px;
+  width: 50px;
+}
+#portfolio .user-info h1 span {
+  font-size: 0.5em;
+  font-style: italic;
+}
+#portfolio .books ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#portfolio .books ul li {
+  margin-top: 20px;
+  padding: 10px;
+  text-align: center;
+  background: white;
+  border-bottom: 1px solid black;
+}
+#portfolio .books ul li a {
+  text-decoration: none;
+  color: black;
+}
+#portfolio .books ul li a i {
+  padding-right: 20px;
+}
+#portfolio .books ul li a i.fa-star {
+  color: yellow;
+  transform: scale(1.2);
+}
+
+/* Defaults */
+#quizzie {
+  width: 90%;
+  margin: 0 auto;
+  padding: 0;
+  background: white;
+}
+
+/* quiz styles */
+/* Defaults */
+#quiz h1 {
+  font-family: cursive;
+  margin: 2px 0;
+}
+
+#quiz h2, #quiz p {
+  font-family: 'Poppins', sans-serif;
+}
+
+h1, h2, p {
+  text-align: center;
+  display: block;
+  width: auto;
+}
+
+.question-wrap h2 {
+  color: white;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+#quiz ul {
+  list-style: none;
+  display: block;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  display: none;
+  /* Step Questions and Answer Options */
+}
+
+#quiz ul.current {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+  animation: currentIn 0.3s ease-in-out forwards;
+}
+
+@keyframes currentIn {
+  0% {
+    transform: translateX(600px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+@keyframes currentOut {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(600px);
+  }
+}
+#quiz ul li {
+  display: inline-block;
+  width: 20%;
+  overflow: auto;
+  text-align: center;
+  background: white;
+  color: black;
+}
+
+#quiz ul li.quiz-answer {
+  width: 23%;
+  min-height: 100%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#quiz ul li.quiz-answer:hover {
+  color: white;
+  background: blue;
+}
+
+#quiz ul li.quiz-answer.red {
+  background: red;
+}
+
+#quiz ul li.quiz-answer.yellow {
+  background: yellow;
+}
+
+#quiz ul li.quiz-answer.blue {
+  background: blue;
+}
+
+#quiz ul li.quiz-answer.black {
+  background: black;
+}
+
+#quiz ul li.quiz-answer.red:hover, #quiz ul li.quiz-answer.yellow:hover, #quiz ul li.quiz-answer.blue:hover, #quiz ul li.quiz-answer.black:hover {
+  background: white;
+}
+
+#quiz ul li.question, #quiz ul li.results-inner {
+  display: block;
+  float: none;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 2%;
+}
+
+#quiz ul li.results-inner {
+  background: white;
+  color: black;
+}
+
+#quiz ul li.results-inner .covers .book {
+  position: relative;
+  width: 150px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin: 5px;
+}
+
+#quiz ul li.results-inner .covers .book:hover {
+  transform: scale(1.1);
+}
+
+#quiz ul li.results-inner .covers img {
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+#quiz ul li.results-inner .covers .overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: none;
+  color: white;
+  font-size: .7em;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid blue;
+  padding: 1px;
+  transition: all 0.3s ease;
+}
+
+#quiz ul li:last-child {
+  margin-right: 0;
+}
+
+#quiz .question-wrap, #quiz .answer-wrap {
+  display: block;
+  padding: 1%;
+  margin: 1em 10%;
+}
+
+#quiz .question.sky {
+  background-image: url("http://weknowyourdreams.com/images/water/water-04.jpg");
+  background-repeat: no-repeat;
+  background-position: cover;
+  background-size: 100%;
+}
+
+#quiz .question.movie {
+  background-image: url("http://www.intrawallpaper.com/static/images/Red_Background_05.jpg");
+  background-repeat: no-repeat;
+  background-position: cover;
+  background-size: 100%;
+}
+
+#quiz .question.sleep {
+  background-image: url("http://www.intrawallpaper.com/static/images/518164-backgrounds.jpg");
+  background-repeat: no-repeat;
+  background-position: cover;
+  background-size: 100%;
+}
+
+#quiz .question.dream {
+  background-image: url("http://www.intrawallpaper.com/static/images/background_patterns_lines_shadow_43860_1920x1080.jpg");
+  background-repeat: no-repeat;
+  background-position: cover;
+  background-size: 100%;
+}
+
+#quiz .question.colour {
+  background-image: url("http://www.intrawallpaper.com/static/images/rainbow_texture679.jpg");
+  background-repeat: no-repeat;
+  background-position: cover;
+  background-size: 100%;
+}
+
+#quiz .question.rather {
+  background-image: url("http://www.intrawallpaper.com/static/images/Windows-10-background.jpg");
+  background-repeat: no-repeat;
+  background-position: cover;
+  background-size: 100%;
+}
+
+#quiz .question.talk {
+  background-image: url("http://www.intrawallpaper.com/static/images/Light-Wood-Background-Wallpaper_JHG6qot.jpg");
+  background-repeat: no-repeat;
+  background-position: cover;
+  background-size: 100%;
+}
+
+#quiz .question.meme {
+  background-image: url("http://htmlcolorcodes.com/assets/images/html-color-codes-color-tutorials-hero-00e10b1f.jpg");
+  background-repeat: no-repeat;
+  background-position: cover;
+  background-size: 100%;
+}
+
+#quiz .answer-wrap img {
+  width: 100%;
+}
+
+/* SEARCH */
+.search-details {
+  margin: 0 auto;
+  
+  text-align: center;
+}
+.search-details .input-group input, .search-details .input-group button {
+font-size: 1.5em;
+}
+.search-details #results img {
+  margin: 5px;
+  box-sizing: border-box;
+  transition: all .2s;
+}
+.search-details #results img:hover {
+  transform: scale(1.1);
+}
+.search-details #results img.selected {
+  border: 3px solid blue;
+}
+</style>

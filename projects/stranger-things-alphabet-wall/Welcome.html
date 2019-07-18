@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      html, body {
+        background-color: #2a2a2b; 
+        color: white;
+        margin: 20px 0 0 0;
+        padding: 0;}
+        
+      a {
+        color: black;}
+        
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;}
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/sC4UAEslTew?autoplay=1" frameborder="0" allowfullscreen></iframe>
+      
+      <h1>Get the key from a sheet of form responses based on <a href="https://docs.google.com/spreadsheets/d/1rzUHjjjZwmGmLbb0yXpHLDvhAf5VhRunaLp_nFs_lA8/copy">this project</a></h1>
+      
+      <form onsubmit="loadSheet(event)">
+        <input type="text" name="sheet_id" />
+        <button type="submit">Start</button>
+      </form>
+      
+      <h1>Project based on: <a href="https://codepen.io/wiiiiilllllll/pen/NRWRya">https://codepen.io/wiiiiilllllll/pen/NRWRya</a></h1>
+    </div>
+    
+    <script>
+      function loadSheet(e) {
+        e.preventDefault();
+        
+        var currentUrl = <?= ScriptApp.getService().getUrl(); ?>;
+        
+        window.open(currentUrl + '?sheet_id=' + e.target.sheet_id.value, '_blank');
+      }
+    </script>
+  </body>
+</html>
+
+

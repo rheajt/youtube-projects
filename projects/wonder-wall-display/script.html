@@ -1,0 +1,63 @@
+<script>
+//use the sheetVars object to get passed in variables from the sheet
+{
+  const refresh = setInterval(getData, 5000);
+  
+  function footerClick(url) {
+    window.open(url, '_blank');
+  }
+  
+  function stopRefresh() {
+    clearInterval(refresh);
+  }
+  
+  function displayChalkboard(res) {
+    const elements = res.map(el => `
+    <div class="scribble">
+      <h3>${el.inq}</h3>
+      <h4>---${el.name}</h4>
+    </div>
+    `);
+    
+    document.querySelector('.container main').innerHTML = elements.join('');
+  }
+  
+  function displayCorkboard(res) {
+    document.querySelector('.container main').innerHTML = res.map(el => `
+      <div class="card">
+        <h3>${el.name} says...</h3>
+        <p>${el.inq}</p>
+      </div>
+    `).join('');
+  }
+  
+  function displayColorful(res) {
+    document.querySelector('.container main').innerHTML = res.map(el => `
+      <div class="bubble">
+        <h2>${el.inq}</h2>
+        <h3>${el.name}</h3>
+      </div>
+    `).join('');
+  }
+  
+  function showData(resp) {
+    if(sheetVars.template === 'chalkboard') {
+      displayChalkboard(resp);
+    } else if(sheetVars.template === 'corkboard') {
+      displayCorkboard(resp);
+    } else if(sheetVars.template === 'colorful') {
+      displayColorful(resp);
+    }
+  }
+  
+  function getData() {
+    google.script.run
+      .withSuccessHandler(showData)
+      .getData(sheetVars);
+  }
+  
+  getData();
+};
+</script>
+
+

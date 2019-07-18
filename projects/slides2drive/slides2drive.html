@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+  <script>
+    var DEVELOPER_KEY = <?= DEVELOPER_KEY ?>;
+    var DIALOG_DIMENSIONS = {width: 600, height: 425};
+    var pickerApiLoaded = false;
+
+    function onApiLoad() {
+      gapi.load('picker', {'callback': function() {
+        pickerApiLoaded = true;
+      }});
+     }
+
+    function getOAuthToken() {
+      google.script.run
+        .withSuccessHandler(createPicker)
+        .withFailureHandler(showError)
+        .getOAuthToken();
+    }
+
+    function createPicker(token) {
+      if (pickerApiLoaded && token) {
+        var picker = new google.picker.PickerBuilder()
+          .addView(google.picker.ViewId.PRESENTATIONS)
+          .enableFeature(google.picker.Feature.NAV_HIDDEN)
+          .enableFeature(google.picker.Feature.MINE_ONLY)
+          .hideTitleBar()
+          .setOAuthToken(token)
+          .setDeveloperKey(DEVELOPER_KEY)
+          .setCallback(pickerCallback)
+          .setOrigin(google.script.host.origin)
+          .setSize(DIALOG_DIMENSIONS.width - 2,
+              DIALOG_DIMENSIONS.height - 2)
+          .build();
+        picker.setVisible(true);
+      } else {
+        showError('Unable to load the file picker.');
+      }
+    }
+
+    function pickerCallback(data) {
+      var action = data[google.picker.Response.ACTION];
+      if (action == google.picker.Action.PICKED) {
+        var doc = data[google.picker.Response.DOCUMENTS][0];
+        var id = doc[google.picker.Document.ID];
+        
+        document.getElementById('result').innerHTML = '<progress></progres>';
+        
+        google.script.run
+          .withSuccessHandler(function(response) {
+            document.getElementById('result').innerHTML = 
+              'We created a folder titled <b>' + response.name + 
+              '</b><br><a href="' + response.url + '" target="_blank">' + response.url + '</a>';
+          })
+          .getThumbnails(id);
+      } else if (action == google.picker.Action.CANCEL) {
+        document.getElementById('result').innerHTML = 'Picker canceled.';
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('result').innerHTML = 'Error: ' + message;
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <style>
+    body {
+      background-color: #efefef;
+      font-family: 'Roboto', sans-serif;
+    }
+    .main {
+      margin: 20px auto;
+      padding: 10px;
+      border: 1px solid black;
+      border-radius: 3px;
+      background-color: white;
+      width: 500px;
+      text-align: center;
+    }
+    @media (max-width: 375px) {
+      .main {
+        width: 100vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <h1>Slides 2 Drive</h1>
+    <h3>Choose a presentation and each slide will be extracted into a folder on the root of your drive. Each slide will be a .png file that you can download and use in a number of different ways.</h3>
+    <button onclick='getOAuthToken()'>Select a file</button>
+    <p id='result'></p>
+    <p>
+      Idea suggested by <a href="https://twitter.com/deelanier">Dee Lanier</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+      Built by <a href="https://twitter.com/rheajt">Jordan Rhea</a>
+    </p>
+  </div>
+  <script src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
+</body>
+</html>

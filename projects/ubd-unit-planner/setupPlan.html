@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+  </head>
+  <body>
+    
+    <button type="button" id="show-new" class="button-primary">New Unit</button>
+    
+    <form id="new-unit" hidden>
+      <label for="unit-title">Unit Title</label>
+      <input type="text" id="unit-title" class="u-full-width">
+      <div class="row">
+        <div class="six columns">
+          <label for="unit-start">Start Date</label>
+          <input type="text" id="unit-start" class="u-full-width">
+        </div>
+        <div class="six columns">
+          <label for="unit-end">End Date</label>
+          <input type="text" id="unit-end" class="u-full-width">
+        </div>
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+    
+    <form id="edit-unit" hidden>
+      <label for="unit-title">Unit Title</label>
+      <input type="text" id="unit-title" class="u-full-width">
+      <div class="row">
+        <div class="six columns">
+          <label for="unit-start">Start Date</label>
+          <input type="text" id="unit-start" class="u-full-width">
+        </div>
+        <div class="six columns">
+          <label for="unit-end">End Date</label>
+          <input type="text" id="unit-end" class="u-full-width">
+        </div>
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+    <table class="u-full-width">
+      <thead>
+        <tr>
+          <td>#</td>
+          <td>Unit Title</td>
+          <td>Start Date</td>
+          <td>End Date</td>
+        </tr>
+      </thead>
+      <tbody id="unit-rows"></tbody>
+    </table>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script>
+      $(function() {
+      
+        //get units from props
+        var units = getUnits();
+          
+        console.log(units);
+        
+        //set datepicker objects
+        $('#unit-start').datepicker();
+        $('#unit-end').datepicker();
+        
+        //bind the click functions
+        $('#new-unit').submit(addUnit);
+        $('#show-new').click(toggleForms);
+        
+        $('#unit-rows').on('click', 'tr', editUnit);
+        
+      });
+      
+      function addUnit() {
+          
+        var unit = {
+          title: $('#unit-title').val(),
+          startDate: $('#unit-start').val(),
+          endDate: $('#unit-end').val()
+        };
+        
+        $('#new-unit input').val('');
+                
+        var rowHtml = '<tr>';
+        rowHtml += '<td>' + ($('#unit-rows > tr').length + 1) + '</td>';
+        rowHtml += '<td>' + unit.title + '</td>';
+        rowHtml += '<td>' + unit.startDate + '</td>';
+        rowHtml += '<td>' + unit.endDate + '</td>';
+        rowHtml += '</tr>';
+        
+        $('tbody').append(rowHtml);
+        
+        $('#new-unit').toggle('slide', {direction: 'down'}, 400, function() {
+          $('#show-new').toggle('slide', 0);
+        });
+        
+        google.script.run
+          .withSuccessHandler(function(resp) { console.log(resp) })
+          .withFailureHandler(function(err) { console.log(err) })
+          .setProps(unit);
+          
+        return false;
+        
+      }
+      
+      function toggleForms() {
+       
+        $('#show-new').toggle('slide', {direction: 'up'}, 400, function() {
+          $('#new-unit').toggle('slide', {direction: 'down'}, 400);
+        });
+        
+      }
+      
+      function editUnit(e) {
+        console.log(e);
+      }
+      
+      function getUnits() {
+        google.script.run
+          .withSuccessHandler(function(resp) {
+            return resp;
+          })
+          .getUnits();
+      }
+    </script>
+  </body>
+</html>
+
+

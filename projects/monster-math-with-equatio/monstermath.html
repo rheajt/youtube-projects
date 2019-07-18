@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+    section {
+      display: none;
+      font-family: Verdana, sans-serif;
+    }
+    .team {
+      box-sizing: border-box;
+      flex: 1;
+      position: relative;
+      transition: all 0.3s;
+      overflow: hidden;
+      height: 100%;
+    }
+    .radio-controls {
+      display: flex;
+      margin-bottom: 22px;
+    }
+    input[type=radio] {
+      display: none;
+    }
+    input[type=radio]:checked + label {
+      border: 10px solid orangered;
+    }
+    label {
+      flex: 1;
+      text-align: center;
+      font-size: 2em;
+      padding: 24px 12px;
+      border: 10px solid black;
+    }
+    .team .controls {
+      display: flex;
+      justify-content: space-between;
+    }
+    .team .controls button {
+      color: white;
+      padding: 9px 18px;
+      flex: 1;
+    }
+    .team .controls button:nth-child(1) {
+      background: #d31749;
+    }
+    .team .controls button:nth-child(2) {
+      background: #00af29;
+    }
+    .team canvas {
+      background: url('https://i.imgur.com/GySvQ.png');
+    }
+    button.btn-primary {
+      width: 100%;
+      padding: 9px 18px;
+      background-color: orangered;
+      color: white;
+    }
+    </style>
+  </head>
+  <body>
+    <section id="setup">
+      <form onsubmit="monstermath.startGame(event)">
+      
+        <h1>Monster Math</h1>
+        
+        <p>How many people/groups will be playing the game?</p>
+        
+        <div class="radio-controls">
+          <input type="radio" name="numPlayers" id="numPlayers1" value="1" checked /><label for="numPlayers1">1 Group</label>
+          <input type="radio" name="numPlayers" id="numPlayers2" value="2" /><label for="numPlayers2">2 Groups</label>
+          <input type="radio" name="numPlayers" id="numPlayers3" value="3" /><label for="numPlayers3"> 3 Groups</label>
+          <input type="radio" name="numPlayers" id="numPlayers4" value="4" /><label for="numPlayers4">4 Groups</label>
+        </div>
+        
+        <div>
+          <button id="start-game-btn" type="submit" class="btn-primary" disabled>Start Game</button>
+        </div>
+      </form>
+    </section>
+    
+    <section id="game">
+      <div class="team">
+        <canvas class="canvas"></canvas>
+        <div class="controls">
+          <button onclick="monstermath.eraseBoard()">Erase</button>
+          <button onclick="monstermath.endTurn()">Done</button>
+        </div>
+        
+      </div>
+    </section>
+    
+    <section id="wait">
+      <h1>Wait for the next player</h1>
+      
+      <div>
+        <button class="btn-primary" onclick="monstermath.startNextTurn()">Ready!</button>
+      </div>
+    </section>
+    
+    <section id="finish">
+      <h1>You finished the questions! Check out the results in the document!</h1>
+      
+      <div>
+        <button class="btn-primary" onclick="monstermath.finishGame()">Save Results</button>
+      </div>
+    </section>
+    
+    <script>
+    class MonsterMath {
+      constructor() {
+        this.gameReady = false;
+        this.players = 2;
+        this.currPlayer = 1;
+        
+        //properties defined for the canvas
+        this.enableDraw = false;
+        this.started = false;
+        
+        //define the sections
+        this.setupSection = document.getElementById('setup');
+        this.gameSection = document.getElementById('game');
+        this.waitSection = document.getElementById('wait');
+        this.finishSection = document.getElementById('finish');
+        
+        //show the setup to get started
+        this.setupSection.style.display = 'block';
+        
+        //get images
+        this.getImages();
+      }
+      
+      startGame(e) {
+        e.preventDefault();   
+        
+        //don't start unless the images are available
+        if(!this.gameReady) {
+          return;
+        }
+        
+        this.players = e.target.numPlayers.value;
+        
+        //hide the setup, show the game
+        this.changeSection(this.setupSection, this.gameSection);
+        
+        this.canvas = document.querySelector('canvas.canvas');
+        
+        this.canvas.width = 769;
+        this.canvas.height = 510;
+        
+        this.context = this.canvas.getContext('2d');
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        //get the gameboard going!
+        //attach event listeners to the canvas
+        
+        
+        this.canvas.addEventListener('mousemove', e => this.onMouseMove(e));
+        this.canvas.addEventListener('mousedown', e => this.onMouseDown(e));
+        this.canvas.addEventListener('mouseup', e => this.onMouseUp(e));
+                
+        //draw the image on the canvas
+        this.drawImage(this.images.shift());
+                
+        //start the timer on the gameboard
+        this.startTimer();
+        
+      }
+      
+      startTimer() {
+        this.counter = 0;
+        this.timer = setInterval(() => {
+          this.context.clearRect(0, 0, this.canvas.width, 40);
+          this.context.font = '20px Georgia';
+          this.context.fillText(`Group ${this.currPlayer}: ${++this.counter}`, 0, 20);
+        }, 1000);
+      }
+      
+      startNextTurn() {
+        this.currPlayer = (this.currPlayer < this.players) ? this.currPlayer + 1 : 1;
+        
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        this.drawImage(this.images.shift());
+        this.changeSection(this.waitSection, this.gameSection);
+        this.startTimer();
+      }
+      
+      eraseBoard() {
+        this.context.clearRect(0, this.topOffset, this.canvas.width, this.canvas.height - this.topOffset);
+      }
+      
+      endTurn() {
+        clearInterval(this.timer);
+        
+        
+        const image = this.canvas.toDataURL();
+        
+        google.script.run
+          .withSuccessHandler(response => {
+            if(!this.images.length) {
+              this.changeSection(this.gameSection, this.finishSection);
+            } else {
+              this.changeSection(this.gameSection, this.waitSection);
+            }            
+          })
+          .appendImage(JSON.stringify(image));
+       
+      }
+      
+      finishGame() {
+        google.script.host.close();
+      }
+      
+      changeSection(hide, show) {
+        hide.style.display = 'none';
+        show.style.display = 'block';
+      }
+      
+      getImages() {
+        google.script.run
+          .withSuccessHandler((resp) => {
+            this.images = resp.map(function(each) {
+              var image = new Image();
+              image.crossOrigin = 'anonymous';
+              image.src = 'data:image/png;base64,' + each;
+              return image;
+            });
+            
+            this.gameReady = true;
+            
+            const button = document.getElementById('start-game-btn');
+            
+            button.disabled = false;
+          })
+          .withFailureHandler((err) => console.log(err))
+          .getImages();
+      }
+      
+      drawImage(img) {            
+        const scale_width = (this.canvas.width - 25) / img.width;
+        const scale_height = this.canvas.height / img.height;
+        
+        const scale = Math.min(scale_width, scale_height);
+        
+        const scaled_width = img.width * scale;  
+        const scaled_height = img.height * scale; 
+        
+        this.topOffset = scaled_height;
+
+        this.context.drawImage(img, 0, 10, scaled_width, scaled_height);
+      }
+
+      onMouseMove(e) {
+        let x, y;
+        // Get the mouse position.
+        if (e.layerX >= 0) {
+          // Firefox
+          x = e.layerX;
+          y = e.layerY;
+        }
+        else if (e.offsetX >= 0) {
+          // Opera
+          x = e.offsetX;
+          y = e.offsetY;
+        }  
+        if (this.enableDraw && y > 50) {
+          if (!this.started) { 
+            this.started = true; 
+            
+            this.context.beginPath(); 
+            this.context.moveTo(x, y);
+            console.log('should be drawing');
+          } else { 
+            this.context.lineTo(x, y); 
+            this.context.stroke(); 
+          }
+        }
+      }
+      
+      onMouseDown(e) {
+        this.enableDraw = true;
+      }
+      
+      onMouseUp(e) {
+        this.enableDraw = false;
+        this.started = false;
+      }
+    }
+    
+    const monstermath = new MonsterMath();
+    </script>
+  </body>
+</html>
+
+

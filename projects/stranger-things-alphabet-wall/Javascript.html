@@ -1,0 +1,90 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script>
+var lights = {  
+  blink: function(el){
+    var bulb = el.find('.bulb');
+    bulb.addClass('lit');
+    setTimeout(function(){
+      bulb.removeClass('lit');
+    },600);
+  },
+  
+  reset: function() {
+    return new Promise(resolve => {
+      (function(count){
+        if (count < 36) {
+          var caller = arguments.callee;
+          window.setTimeout(function() {
+            var rand = Math.floor(Math.random() * 26) + 1;
+            var el = $('.foreground .row .item').eq(rand);
+            var el2 = $('.item').eq(rand*2);
+            lights.blink(el);
+            lights.blink(el2);
+            $('html').toggleClass('flicker');
+            caller(count + 1);
+          }, Math.floor(Math.random() * 100));
+        } else {
+          resolve();
+        }
+      })(0)
+    });
+  }
+} //end of the lights object
+
+function Questions() {
+  this.current = 0;
+  this.lastRow = 0;
+  google.script.run
+    .withSuccessHandler(resp => {
+      this.questions = resp;
+      this.startCycle();      
+    })
+    .withFailureHandler(error => console.log(error))
+    .getQuestions();
+}
+
+Questions.prototype.startCycle = function(msg) {
+  setTimeout(() => {
+    var currentQuestion = this.questions[this.current].question.replace(/\W/g , ''),
+        currentAnswer = this.questions[this.current].answer,
+        msgArr = msg ? msg.toLowerCase().split('') : currentQuestion.toLowerCase().split(''),
+        $el = $('#item--' + msgArr.shift());
+    
+    lights.blink($el);
+    
+    //check to see if answer exists    
+    if(!msgArr.length) {
+      google.script.run
+        .withSuccessHandler(response => {
+          
+          //if success display correct answer
+          if(response.success) {
+            $('.panelling').text(response.message);
+            this.nextQuestion();
+          } else {
+            //if no correct answers start cycle again
+            this.lastRow = response.lastRow;
+            this.startCycle();
+          }        
+        })
+        .checkAnswers(this.questions[this.current].question, currentAnswer, this.lastRow);
+    } else {
+      this.startCycle(msgArr.join(''));
+    }
+  }, 400);
+}
+
+Questions.prototype.nextQuestion = function() {
+  lights.reset().then(() => {
+    //increment the current question by 1 or go back to 0
+    this.current = this.current < this.questions.length - 1 ? this.current + 1: 0;
+    
+    //start the cycle again
+    this.startCycle();
+  });  
+}
+
+$(function(){
+  var review = new Questions();
+})
+</script>

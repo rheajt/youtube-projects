@@ -1,0 +1,41 @@
+<script>
+function getTweets() {
+  google.script.run
+  .withSuccessHandler(function(tweets) {
+    var tweetsEl = document.getElementById('tweets');
+    
+    tweetsEl.innerHTML = '';
+    
+    tweets.forEach(function(tweet) {
+      tweetsEl.innerHTML += '<li onclick="selectTweet(event)" data-image="' + tweet[1] + '">' + tweet[0] + '</li>';
+    });
+  })
+  .getTweets();
+}
+
+function selectTweet(e) {
+  var actives = document.querySelectorAll('.active');
+  
+  for(var i = 0; i < actives.length; i++) {
+    actives[i].className = '';
+  }
+  
+  e.target.className = 'active';
+  
+  console.log(e.target.dataset.image);
+}
+
+function sendTweet() {
+  var li = document.querySelector('.active');
+  
+  var tweet = li.textContent;
+  
+  var image = li.dataset.image;
+  
+  google.script.run
+  .withSuccessHandler(google.script.host.close)
+  .sendTweet(tweet, image);
+}
+
+window.onload = getTweets;
+</script>

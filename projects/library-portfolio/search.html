@@ -1,0 +1,49 @@
+<section class="search-details">
+  <div class="input-group">
+    <input type="text" id="book-search">
+    <button onclick="search()">Search</button>
+  </div>
+  
+  <div id="results"></div>
+  
+  <button type="button" onclick="startReport()">Start Project</button>
+  <button type="button" id="show-log">Back to log</button>
+</section>
+
+<script>
+function search() {
+  
+  $('#results').append('<h3>Loading...</h3><progress></progress>');
+  
+  google.script.run
+    .withSuccessHandler(searchResults)
+    .searchBooks($('#book-search').val());
+    
+}
+
+function searchResults(response) {
+  
+  var html = response.map(function(book) {
+    return $('<img>').attr('src', book[2])
+      .data('info', {title: book[0], author: book[1], coverLink: book[2]})
+      .on('click', selectBook);
+  });
+  
+  $('#results').empty().append(html);
+    
+}
+function selectBook(e) {
+  $('.selected').removeClass();
+  $(e.target).addClass('selected');
+}
+      
+function startReport() {
+  var book = $('#results img.selected').data('info');
+  
+  $('#results').empty().append('<progress></progress>');
+  
+  google.script.run
+    .withSuccessHandler(function() {changeRoute('portfolio');})
+    .startBook(book);
+}
+</script>

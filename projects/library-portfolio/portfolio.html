@@ -1,0 +1,35 @@
+<section id="portfolio">
+  <div class="user-info"></div>
+  
+  <div class="books">
+    <ul></ul>
+  </div>
+  
+  <script>
+  function getPortfolio() {
+    google.script.run
+      .withSuccessHandler(showPortfolio)
+      .getPortfolio();
+  }
+  function showPortfolio(response) {
+    
+    if(response.avatar) {
+      var avatar = response.avatar.split('edit')[0] + 'pub?w=200&amp;h=200';
+    } else {
+      var avatar = '';
+    }
+    var userName = response.userName;
+    var email = response.email;
+    
+    $('#portfolio .user-info').append('<img src="'+ avatar +'" alt="avatar needed"><h1><a href="' + response.folderURL + '" target="_blank">'+ userName +'<span>'+ email +'</span></a></h1>');
+    var li = '';
+    response.projects.forEach(function(book) {
+      var star = (book.isStarred) ? 'fa fa-star' : 'fa fa-star-o';
+      li += '<li><a href="' + book.link + '" target="_blank"><i class="'+ star +'"></i>' + book.name + '</a></li>';
+    });
+    $('.books ul').append(li);
+  }
+  
+  $(getPortfolio);
+  </script>
+</section>

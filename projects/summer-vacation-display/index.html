@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        padding: 0;
+        margin: 0;
+      }
+      .container {
+        display: flex;
+      }
+      #map {
+        flex: 3;
+        height: 100vh;
+      }
+      #mappers {
+        flex: 1;
+        box-shadow: 3px 0px 7px 4px black;
+        z-index: 9999;
+      }
+      #shortUrl {
+        z-index: 9999;
+        color: #f7584c;
+        top: 0;
+        left: 100px;
+        position: absolute;
+      }
+      #shortUrl h1 {
+        margin: 0 24px;
+        text-shadow: 2px 2px 6px black;
+      }
+      #popular {
+        z-index: 9999;
+        position: absolute;
+        color: black;
+        bottom: 0;
+      }
+      #popular button {
+        width: 100%;
+        color: white;
+        display: block;
+        background-color: #f7584c;
+      }
+      #tagList {
+        list-style: none;
+        padding: 0 6px;
+      }
+      #tagList li {
+        margin:0;
+        padding: 0;
+      }
+      #tagList li img {
+        max-width: 100%;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="map"></div>
+      
+      <div id="mappers">
+        <div id="shortUrl">
+          <h1><?= shortUrl ?></h1>
+        </div>
+        <div id="popular">
+          <ul id="tagList"></ul>
+          <button onclick="stopResults()">Stop Everything</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      var map, cities = [], counter = 0, getCitiesInterval, pinnedCities = [];
+      
+      function initMap() {
+        getCities();
+        getCitiesInterval = setInterval(getCities, 4000);
+      }
+      
+      function getCities() {
+        google.script.run
+          .withSuccessHandler(function(resp) {
+          
+            if(cities.length) {
+              console.log(resp);
+              var startIndex = cities.length;
+              
+              var newEntries = resp.splice(startIndex);
+              
+              cities = cities.concat(newEntries);
+            } else {
+              cities = resp;
+            }            
+            
+            //create the map and center it on the first response
+            if(!map) {
+              map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 3,
+                center: cities[counter].latLng
+              });
+            }
+          
+            placeMarker();
+          })
+          .getCities();
+      }
+      
+      function placeMarker() {
+        var currentCity = cities[counter];        
+        map.panTo(currentCity.latLng);
+        
+        if(!currentCity.pinned) {
+          var tag = `${currentCity.name} - ${currentCity.city}`;
+          
+          var newMarker = new google.maps.Marker({
+            position: cities[counter].latLng,
+            animation: google.maps.Animation.DROP,
+            title: tag,
+            map: map
+          });
+          
+          document.getElementById('tagList').innerHTML += `<li>${tag}</li>`;
+        }
+        
+        currentCity.pinned = true;
+        counter = (counter < cities.length - 1) ? counter + 1 : 0;
+      }
+      
+      function stopResults() {
+        clearInterval(getCitiesInterval);
+      }
+      
+      
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDd-HrJBkbCU6kVvaTJBh9hS-rSPMexi5w&callback=initMap">
+    </script>
+  </body>
+</html>

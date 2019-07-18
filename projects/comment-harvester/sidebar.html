@@ -1,0 +1,80 @@
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+<style>
+.block.form-group {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+</style>
+<div class="sidebar">  	
+  <div class="block form-group">
+    <select id="select"></select>
+    <button class="action" onclick="saveSettings()">Save Classroom</button>
+  </div>
+  
+  <hr />
+  
+  <button class="create" onclick="loadComments()">Load Comments</button>
+  
+  <p class="load-comment-data"></p>
+</div>
+<script>
+  function loadComments() {
+    google.script.run
+      .withSuccessHandler(function(fileIds) {
+        harvestComments(fileIds);
+      })
+      .withFailureHandler(console.error)
+      .loadComments();
+  }
+  
+  function harvestComments(fileIds) {
+    const loadCommentData = document.querySelector('.load-comment-data')
+    loadCommentData.textContent = fileIds.length + ' files being processed';
+    
+    google.script.run
+      .withSuccessHandler(() => loadCommentData.textContent = 'Great Success!')
+      .withFailureHandler(() => loadCommentData.textContent = 'Something went wrong')
+      .harvestComments(fileIds);
+  }
+
+  function getSettings() {
+    google.script.run
+      .withSuccessHandler(function(settings) {
+        var select = document.getElementById('select');
+        
+        if(settings) {
+          select.value = settings;
+        }
+      })
+      .withFailureHandler(console.error)
+      .getSettings();
+  }  
+  
+  function saveSettings() {
+    var select = document.getElementById('select');
+    
+    var settings = select.value;
+    
+    google.script.run
+      .withSuccessHandler(function() {})
+      .withFailureHandler(function() {})
+      .saveSettings(settings);
+  }
+
+  google.script.run
+    .withSuccessHandler(function(response) {
+      var select = document.getElementById('select');
+      var options = [];
+      for(var i = 0; i < response.length; i++) {
+        options.push(`<option value="${response[i].id}">${response[i].name}</option>`);
+      }
+      select.innerHTML = options.join('');
+      
+      getSettings();
+    })
+    .withFailureHandler(function(error) {
+      console.error(error);
+    })
+    .listClassrooms();
+  
+</script>

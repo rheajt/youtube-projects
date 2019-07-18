@@ -1,0 +1,38 @@
+<?!= HtmlService.createHtmlOutputFromFile('styles').getContent() ?>
+
+<body>
+
+  <nav id="router">
+    <h1>Library Portfolio</h1>
+    <button onclick="changeRoute('portfolio')">Portfolio</button>
+    <button onclick="changeRoute('search')">Search</button>
+    <button onclick="changeRoute('quiz')">Mood Quiz</button>
+  </nav>
+
+</body>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+function showContent(response) {
+  
+  if($('body section')) {
+    $('body section').remove();
+  }
+  
+  $('body').append(response);
+}
+
+function changeRoute(route) {
+  google.script.run
+    .withSuccessHandler(showContent)
+    .changeRoute(route);
+    
+}
+$(changeRoute('portfolio'));
+</script>
+
+
+
+
+
+

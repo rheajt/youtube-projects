@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link href="https://fonts.googleapis.com/css?family=Cabin+Sketch" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+    <style>
+      html {
+        color: white;
+        background-image: url(https://i.imgur.com/w1rE7k0.jpg);
+        background-size: cover;
+        background-position: center center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Cabin Sketch', cursive;
+      }
+      
+      main h3,
+      main h4 {
+        color: #ffe382;
+        text-shadow: 1px 1px 2px #000000;
+      }      
+      main {
+        margin: 0 auto;
+        width: 80%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        padding-bottom: 30px;
+      }
+      
+      .scribble {
+        width: 30%;
+      }
+      
+      footer {
+        display: flex;
+        position: fixed;
+        width: 100%;
+        background-color: white;
+        color: #3d3d3d;
+        bottom: 0;
+        border-top: 1px solid #7a7a7a;
+        box-shadow: 0px -2px 2px 0px rgba(0, 0, 0, 0.35);
+        justify-content: space-around;
+        align-items: center;
+        
+      }
+      footer h4 {
+        margin: 7px;
+        transition: all 0.3s;
+      }
+      footer h4:hover {
+        transform: scale(1.2);
+      }
+      footer .fa-youtube-play {
+        color: #9e1414;
+      }
+      footer .fa-twitter {
+        color: #005fcc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <main>
+      </main>
+    
+      <footer>
+        <h4 onclick="footerClick('http://jordanrhea.com/teachertools')">jordanrhea.com</h4>
+      
+        <h4 onclick="footerClick('https://twitter.com/rheajt')"><i class="fa fa-twitter"></i> / rheajt</h4>
+    
+        <h4 onclick="footerClick('https://youtube.com/jordanrhea')"><i class="fa fa-youtube-play"></i> / jordanrhea</h4>
+      </footer>  
+    </div>
+        
+    <script>
+      var sheetVars = JSON.parse(<?!= JSON.stringify(sheetVars); ?>);
+    </script>
+    <?!= HtmlService.createHtmlOutputFromFile('script').getContent() ?>
+
+  </body>
+</html>
+
+

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link href="https://fonts.googleapis.com/css?family=Gloria+Hallelujah" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+    <style>
+    html {
+      background: #d3d3d3;
+    }
+    .container {
+      font-family: 'Gloria Hallelujah', cursive;
+    }
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin-bottom: 60px;
+    }
+    .bubble {
+      position: relative;
+      color: white;
+      padding: 12px;
+      border-radius: .4em;
+      position: relative;
+      margin-bottom: 60px;
+      box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5), inset 1px 2px 0px rgba(255, 255, 255, 0.4);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7), 0px 1px 0px rgba(255, 255, 255, 0.4);
+    }
+    .bubble h3 {
+      position: absolute;
+      color: black;
+      right: 0;
+    }
+    
+    .bubble:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border: 41px solid transparent;
+      border-bottom: 0;
+      border-right: 0;
+      margin-left: -60px;
+      margin-bottom: -41px;
+    }
+    
+    .bubble:nth-child(1n) {
+      background: red;
+    }
+    .bubble:nth-child(1n):after {
+      border-top-color: red;
+    }
+    
+    .bubble:nth-child(2n) {
+      background: orange;
+    }
+    .bubble:nth-child(2n):after {
+      border-top-color: orange;
+    }
+    
+    .bubble:nth-child(3n) {
+      background: green;
+    }
+    .bubble:nth-child(3n):after {
+      border-top-color: green;
+    }
+    
+    .bubble:nth-child(4n) {
+      background: blue;
+    }
+    .bubble:nth-child(4n):after {
+      border-top-color: blue;
+    }
+    
+    .bubble:nth-child(5n) {
+      background: indigo;
+    }
+    .bubble:nth-child(5n):after {
+      border-top-color: indigo;
+    }
+    
+    .bubble:nth-child(6n) {
+      background: violet;
+    }
+    .bubble:nth-child(6n):after {
+      border-top-color: violet;
+    }
+    footer {
+        display: flex;
+        position: fixed;
+        width: 100%;
+        background-color: white;
+        color: #3d3d3d;
+        bottom: 0;
+        border-top: 1px solid #7a7a7a;
+        box-shadow: 0px -2px 2px 0px rgba(0, 0, 0, 0.35);
+        justify-content: space-around;
+        align-items: center;
+        
+      }
+      footer h4 {
+        margin: 7px;
+        transition: all 0.3s;
+      }
+      footer h4:hover {
+        transform: scale(1.2);
+      }
+      footer .fa-youtube-play {
+        color: #9e1414;
+      }
+      footer .fa-twitter {
+        color: #005fcc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <main></main>
+      <footer>
+        <h4 onclick="footerClick('http://jordanrhea.com/teachertools')">jordanrhea.com</h4>
+      
+        <h4 onclick="footerClick('https://twitter.com/rheajt')"><i class="fa fa-twitter"></i> / rheajt</h4>
+    
+        <h4 onclick="footerClick('https://youtube.com/jordanrhea')"><i class="fa fa-youtube-play"></i> / jordanrhea</h4>
+      </footer>
+    </div>
+    
+    <script>
+      var sheetVars = JSON.parse(<?!= JSON.stringify(sheetVars); ?>);
+    </script>
+    <?!= HtmlService.createTemplateFromFile('script').evaluate().getContent() ?>
+  </body>
+</html>
+
+

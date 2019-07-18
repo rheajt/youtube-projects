@@ -1,0 +1,164 @@
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+// Quiz result options in a separate object for flexibility
+// pulled from the responses to a google form
+var resultOptions = [];
+google.script.run
+  .withSuccessHandler(function(response) {
+    resultOptions = JSON.parse(response);
+  })
+  .getJSON();
+  
+// global variables
+var quizSteps = $('#quiz .quiz-step'),
+    totalScore = 0;
+
+// for each step in the quiz, add the selected answer value to the total score
+// if an answer has already been selected, subtract the previous value and update total score with the new selected answer value
+// toggle a visual active state to show which option has been selected
+quizSteps.each(function () {
+    var currentStep = $(this),
+        ansOpts = currentStep.children('.quiz-answer');
+    // for each option per step, add a click listener
+    // apply active class and calculate the total score
+    ansOpts.each(function () {
+        var eachOpt = $(this);
+        eachOpt[0].addEventListener('click', check, false);
+        function check() {
+            var $this = $(this),
+                value = $this.attr('data-quizIndex'),
+                answerScore = parseInt(value);
+            // check to see if an answer was previously selected
+            if (currentStep.children('.active').length > 0) {
+                var wasActive = currentStep.children('.active'),
+                    oldScoreValue = wasActive.attr('data-quizIndex'),
+                    oldScore = parseInt(oldScoreValue);
+                // handle visual active state
+                currentStep.children('.active').removeClass('active');
+                $this.addClass('active');
+                // handle the score calculation
+                totalScore -= oldScoreValue;
+                totalScore += answerScore;
+                calcResults(totalScore);
+            } else {
+                // handle visual active state
+                $this.addClass('active');
+                // handle score calculation
+                totalScore += answerScore;
+                calcResults(totalScore);
+                // handle current step
+                updateStep(currentStep);
+            }
+        }
+    });
+});
+
+// show current step/hide other steps
+function updateStep(currentStep) {
+    if(currentStep.hasClass('current')){
+       currentStep.removeClass('current');
+       currentStep.next().addClass('current');
+    }
+}
+
+// display scoring results
+function calcResults(totalScore) {
+    // only update the results div if all questions have been answered
+    if (quizSteps.find('.active').length == quizSteps.length){
+        var resultsTitle = $('#results li h1'),
+            resultsDesc = $('#results li .desc'),
+            resultsCovers = $('#results li .covers');
+        
+        // calc lowest possible score
+        var lowestScoreArray = $('#quiz .low-value').map(function() {
+            return $(this).attr('data-quizIndex');
+        });
+        var minScore = 0;
+        for (var i = 0; i < lowestScoreArray.length; i++) {
+            minScore += lowestScoreArray[i] << 0;
+        }
+        // calculate highest possible score
+        var highestScoreArray = $('#quiz .high-value').map(function() {
+            return $(this).attr('data-quizIndex');
+        });
+        var maxScore = 0;
+        for (var i = 0; i < highestScoreArray.length; i++) {
+            maxScore += highestScoreArray[i] << 0;
+        }
+        // calc range, number of possible results, and intervals between results
+        var range = maxScore - minScore,
+            numResults = resultOptions.length,
+            interval = range / (numResults - 1),
+            increment = '',
+            n = 0; //increment index
+        // incrementally increase the possible score, starting at the minScore, until totalScore falls into range. then match that increment index (number of times it took to get totalScore into range) and return the corresponding index results from resultOptions object
+        while (n < numResults) {
+            increment = minScore + (interval * n);
+            if (totalScore <= increment) {
+                // populate results
+                resultsTitle.replaceWith("<h1>" + resultOptions[n].title + "</h1>");
+                resultsDesc.replaceWith("<p class='desc'>" + resultOptions[n].desc + "</p>");
+                
+                resultsCovers.empty();
+                
+                // Use this to get 5 random books
+                var books = [];
+                for(var i = 5; i > 0; i--) {
+                  var randBook = Math.floor(Math.random() * resultOptions[n].books.length);
+                  
+                  var book = resultOptions[n].books.splice(randBook, 1);
+                  
+                  if(book[0]) {
+                    var div = $('<div>').addClass('book');
+                    
+                    div.append($('<img>').attr('src', book[0].coverLink || 'http://placehold.it/150x225')
+                                          .data('info', book[0])
+                                          .click(selectBook));
+                                          
+                    div.append($('<div class="overlay">').html('<p><b>' + book[0].title + '</b>' + book[0].blurb + '</p>')
+                                                        .click(selectBook));
+                        
+                    
+                    books.push(div);
+                  
+                  } 
+                }
+                
+                resultsCovers.append(books);
+                return;
+            } else {
+                n++;
+            }
+        }
+    }
+}
+
+function selectBook(e) {
+  $('.overlay').hide();
+  
+  var clicked = $(e.target);
+  
+  if(clicked.hasClass('overlay')) {
+    clicked.removeClass('selected').hide();
+  } else {
+    clicked.addClass('selected').siblings().toggle();
+  }
+}
+
+function startBook() {
+  var book = $('img.selected').data('info');
+  
+  if(book) {
+    $('.results-inner').empty().append('<progress></progress>');
+    
+    google.script.run
+      .withSuccessHandler(showLink)
+      .startBook(book);
+  }
+}
+
+function showLink(response) {
+  $('.results-inner').empty().append('<a href="' + response + '" target="_blank">Your file!</a>');
+}
+
+</script>

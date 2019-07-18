@@ -1,0 +1,71 @@
+<style>
+  body {
+    background-color: #eeeeee;
+    margin: 0;
+    padding: 0;
+  }
+  .color-note {
+    display: flex;
+  }
+  .color-note {
+    flex: 3;
+  }
+  .color-note button {
+    flex: 1;
+  }
+  .card {
+    width: 275px;
+    background-color: white;
+    box-shadow: 2px 2px 2px darkgrey;
+    margin: 4px 8px;
+    padding: 4px;
+    white-space: pre-wrap;
+  }
+</style>
+
+<body>
+  <main>
+    <div class="color-note">
+      <textarea id="colors" class="card"></textarea>
+      <button onclick="putTheme()">Save</button>
+    </div>
+    
+    <div class="cards"></div>
+  </main>
+  <script>
+  //put your code here
+  function getThemes() {
+    startProgress()
+    google.script.run
+      .withSuccessHandler(renderThemes)
+      .getThemes();
+  }
+  
+  function putTheme() {
+    var colors = document.getElementById('colors');
+    
+    startProgress();
+    google.script.run
+    .withSuccessHandler(renderThemes)
+    .putTheme(colors.value);
+    
+    colors.value = '';
+  }
+  
+  function startProgress() {
+    document.querySelector('.cards').innerHTML = '<progress></progress>';
+  }
+  
+  function renderThemes(themes) {
+    var themeDivs = themes.map(function(theme) {
+      return '<div class="card">' + theme + '</div>';
+    });
+    
+    var cards = document.querySelector('.cards');
+    
+    cards.innerHTML = themeDivs.join('');
+  }
+  
+  window.onload = getThemes();
+  </script>
+</body>

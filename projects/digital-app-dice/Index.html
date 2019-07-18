@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= HtmlService.createHtmlOutputFromFile('Styles').getContent() ?>
+  </head>
+  <body>
+  
+    <header>
+      <h1>Digital App Dice</h1>
+      
+      <select name="platform" id="platform" onchange="changePlatform()">
+        <option value="mobile">Mobile</option>
+        <option value="web">Web</option>
+      </select>
+      
+      <input type="number" id="numberDice" value="2" onchange="changeDice()">
+    </header>
+    
+    <main></main>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+    var categories;
+    
+    function main() {
+      var categoryURL = 'https://script.google.com/a/gtrainerdemo.jordanrhea.com/macros/s/AKfycbxLPqN0eE2MXnri-2teZVOOw0KwBUXK11RNC-dgXO_F_DoTSDA/exec';
+      $.getJSON(categoryURL)
+        .then(function(response) {
+          categories = response;
+          
+          changePlatform();
+          changeDice();
+        });     
+    }
+    
+    function changeDice() {
+      var numberDice = $('#numberDice').val();
+      
+      var $dice = $();
+      
+      for(var i = 0; i < numberDice; i++) {
+        $dice = $dice.add(`
+          <div class="container">
+            <div class="die"></div>
+            <select class="category" onchange="rollDie(event)"></select>
+          </div>
+        `);
+      }
+      
+      $('main').empty().append($dice);
+      changePlatform();
+    }
+    
+    function rollDie(e) {
+      var animation = 'animated bounce';
+    
+      $(e.target).prev().addClass(animation);
+      
+      $(e.target).prev().one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+        $(e.target).prev().removeClass(animation);
+        var dieCategory = e.target.value;
+        var platform = $('#platform').val();
+        
+        var yourCats = categories[platform][dieCategory]
+          .sort(function() {return 0.5 - Math.random();});
+          
+        $(e.target).prev().text(yourCats[0]);
+      });
+      
+      
+    }
+    
+    function changePlatform() {
+      var platform = $('#platform').val();
+      
+      var $elements = Object.keys(categories[platform])
+        .map(function(key) {
+          return `<option value="${key}">${key}</option>`;
+        });
+       
+      $('.category').empty().append($elements);
+    }
+    
+    $(main)
+    </script>
+  </body>
+</html>
+
+

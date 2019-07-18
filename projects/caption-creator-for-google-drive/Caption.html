@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <base target="_top">
+    <?!= HtmlService.createHtmlOutputFromFile('Stylesheet').setSandboxMode(HtmlService.SandboxMode.IFRAME).getContent() ?>
+  </head>
+  <body class="container">
+    
+    <div class="row">
+      <div class="six columns">
+        <h4>Caption Creator for Google Drive</h4>
+        <h5><?= title ?></h5>
+        <input type="hidden" id="vid-title" value="<?= title ?>" />
+        <video id="video-player" width="100%" src="https://drive.google.com/uc?export=download&id=<?= vidId ?>" controls="controls"></video>
+      </div>
+      
+      <div class="six columns" id="controls">
+        <label>Type your captions below</label>
+        <textarea id="caption-text" class="u-full-width"></textarea>
+        
+        <label>
+          <b>SRT File Viewer </b>
+          <input type="checkbox" id="time-stamps">
+          <span class="label-body">Show time Stamps?</span>
+        </label>
+        <textarea id="caption-viewer"></textarea>
+        
+        <div id="download-btns">
+          <button type="click" class="button-primary" id="download-srt">Download</button>
+          <button type="click" id="save-to-drive">Save SRT into a Google Doc</button>
+        </div>
+      </div>
+    </div> <!-- end of the row -->
+    
+    <footer>
+      <h6><a href="//www.createaccessibility.com">www.createaccessibility.com</a> Created by <a href="https://twitter.com/maoliver17">@maoliver17</a> Coded by<a href="https://twitter.com/rheajt">@rheajt</a></h6>
+    </footer>
+
+    <script>
+      
+      //a couple of global variables
+      var vid = document.getElementById('video-player');
+      var timerId;
+      var captionData = {
+        count: 1,
+        time: 0
+      };
+      
+      //runs when user starts typing
+      function onType() {
+        
+        clearTimeout(timerId);
+        
+        if(!vid.paused) {
+          vid.pause();
+        }
+        startTimer();
+      }
+      
+      //start or restart the timer when there is typing, set to run the doneType function after 3 seconds
+      function startTimer() {
+        timerId = setTimeout(doneType, 3000);
+      }
+      
+      //function will run if there has been no typing for 3 seconds
+      function doneType() {
+        //get the current srt string as an array
+        var srt = getSrtArray();
+        var saveTimes = document.getElementById('time-stamps').checked;
+        var currentText = document.getElementById('caption-text');
+        
+        
+        if(saveTimes) {
+          srt.push(captionData.count + '\r\n');
+        
+          srt.push(secondsToHms(captionData.time) + ' --> ' + secondsToHms(vid.currentTime) + '\r\n');
+        }
+        srt.push(currentText.value + '\r\n\r\n');
+        
+        //increment the caption count and set the start time for the next caption
+        captionData.count++;
+        captionData.time = vid.currentTime;
+        
+        //clear the textarea
+        currentText.value = '';
+        
+        //set the textarea viewer value to the updated srt string and restart the video
+        document.getElementById('caption-viewer').value = srt.join('');
+        vid.play();
+      }
+      
+      //function to get the textarea value and break it into an array
+      function getSrtArray() {
+        return document.getElementById('caption-viewer').value.split('\r\n');
+      }
+      
+      //slightly modified function from stackoverflow, used to convert the seconds of the video into the
+      //format required by an srt file.
+      //i was advised that the srt file comes out better when it isn't used by @maoliver17 which is why
+      //the checkbox allows you to disable the need for this
+      function secondsToHms(d) {
+        d = Number(d);
+        
+        var h = Math.floor(d / 3600);
+        var m = Math.floor(d % 3600 / 60);
+        var s = Math.floor(d % 3600 % 60);
+        var milli = d.toString().split('.')[1] || '000';
+        
+        //added this to make sure the hour is always two digits. not sure when anyone will ever be captioning
+        //a 10+ hour video with this tool, but just in case...
+        if(h < 10) {
+          h = '0' + h;
+        }
+        
+        //complicated ternary operation!
+        return ((h >= 0 ? h + ":" + (m < 10 ? "0" : "") : "") + m + ":" + (s < 10 ? "0" : "") + s + ',' + milli.substr(0, 3)); 
+      }     
+      
+      //another modified function i found on stackoverflow that sends a download. allows the user
+      //to trigger a download of the srt file that can be opened in a text editor
+      function downloadSrt() {
+        var srt = getSrtArray();
+        var text = srt.join('');
+        var filename = document.getElementById('vid-title').value + '.srt';
+        
+        vid.pause();
+        
+        var pom = document.createElement('a');
+        pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        pom.setAttribute('download', filename);
+    
+        if (document.createEvent) {
+          var event = document.createEvent('MouseEvents');
+          event.initEvent('click', true, true);
+          pom.dispatchEvent(event);
+        }
+        else {
+          pom.click();
+        }
+      }
+      
+      //for the chromebook users, you have the option of saving the text to your drive and editing with docs
+      function saveToDrive() {
+        var srt = getSrtArray();
+        
+        vid.pause();
+        
+        google.script.run
+          .withSuccessHandler(function(resp) {
+            var btns = document.getElementById('download-btns');
+            
+            //when the file is created, a link is added for the user
+            btns.innerHTML += '<br><a href="' + resp + '" target="_blank">Go to file</a>';
+          })
+          .saveToDrive(srt.join(''), document.getElementById('vid-title').value);
+      }
+      
+      //event handlers for the user actions
+      document.getElementById('download-srt').addEventListener('click', downloadSrt);
+      document.getElementById('save-to-drive').addEventListener('click', saveToDrive);
+      document.getElementById('caption-text').addEventListener('keydown', onType);
+      
+    </script>
+  </body>
+</html>
+
+
