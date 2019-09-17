@@ -1,0 +1,20 @@
+{
+  "timeZone": "Asia/Hong_Kong",
+  "dependencies": {
+    "enabledAdvancedServices": [{
+      "userSymbol": "YouTube",
+      "serviceId": "youtube",
+      "version": "v3"
+    }]
+  },
+  "dataStudio": {
+    "name": "Developer Data",
+    "logoUrl": "https://jordanrhea.com/static/isotope-81ac8718d875fc9e5fad9213dd690341.png",
+    "company": "jordanrhea.com",
+    "companyUrl": "jordanrhea.com",
+    "addonUrl": "https://techyenglish.com",
+    "supportUrl": "https://techyenglish.com",
+    "description": "get developer data",
+    "sources": ["stackoverflow", "github"]
+  }
+}
