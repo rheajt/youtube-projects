@@ -12,7 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/google-apps-script": "0.0.31",
-    "pug": "^2.0.3",
+    "pug": "^3.0.1",
     "pug-cli": "^1.0.0-alpha6"
   }
 }
